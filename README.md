@@ -91,7 +91,7 @@ composer require loner/console
   # 列出全部命令
   > php index.php list
     
-  # 列出以名称或命名空间“demo”开头的命令
+  # 列出名称或命名空间以“demo”开头的命令
   > php index.php list demo
   ```
 
@@ -184,14 +184,14 @@ composer require loner/console
       >   * 最好复合变量命名规范
 
       > * mode 取值模式
-      >  * 0
-      >    * 存在默认值，可选择是否提供值（此类参数后不能接含 Argument::REQUIRED 参数）
-      >  * Argument::REQUIRED
-      >    * 必须提供值
-      >  * Argument::COMPLEX
-      >    * 复合（多）值（此类参数只能放在末尾）
-      >  * Argument::COMPLEX | Argument::REQUIRED
-      >    * 复合（多）值，必须提供值（此类参数只能放在末尾）
+      >   * 0
+      >     * 存在默认值，可选择是否提供值（此类参数后不能接含 Argument::REQUIRED 参数）
+      >   * Argument::REQUIRED
+      >     * 必须提供值
+      >   * Argument::COMPLEX
+      >     * 复合（多）值（此类参数只能放在末尾）
+      >   * Argument::COMPLEX | Argument::REQUIRED
+      >     * 复合（多）值，必须提供值（此类参数只能放在末尾）
 
       > * description 简介
 
@@ -216,16 +216,16 @@ composer require loner/console
       >  * 单字符，不能为空字符，不能为“-”
 
       > * mode 取值模式
-      >  * 0
-      >    * 不取值，只用于判断是否含该选项
-      >  * Option::REQUIRED
-      >    * 必须提供值 
-      >  * Option::OPTIONAL
-      >    * 可选择是否提供值
-      >  * Option::COMPLEX | Option::REQUIRED
-      >    * 复合（多）值、必须提供值
-      >  * Option::COMPLEX | Option::OPTIONAL
-      >    * 复合（多）值、可选择是否提供值
+      >   * 0
+      >     * 不取值，只用于判断是否含该选项
+      >   * Option::REQUIRED
+      >     * 必须提供值 
+      >   * Option::OPTIONAL
+      >     * 可选择是否提供值
+      >   * Option::COMPLEX | Option::REQUIRED
+      >     * 复合（多）值、必须提供值
+      >   * Option::COMPLEX | Option::OPTIONAL
+      >     * 复合（多）值、可选择是否提供值
 
       > * description 简介
 
@@ -267,7 +267,7 @@ composer require loner/console
   >   # 获取选项值
   >    # 复合型，返回字符串值列表；否则返回字符串
   >    # 若指定选项名，为提供值，返回 null
-  >   $concrete->hasOption('选项名');    
+  >   $concrete->getOption('选项名');    
   >   ```
 
   > * 消息输出
@@ -285,11 +285,16 @@ composer require loner/console
   >   $output->write('这是错误标签样式：<error>错误</error>');
   >   $output->write(PHP_EOL);
   >   
+  >   $output->write('<css href="http://baidu.com">自定义标签，链接到百度</css>');
+  >
+  >   // Loner\Console\Output\Style
   >   $output->write(sprintf(
-  >       '<css href="%s" fg="%s" bg="%s" options="%s">%s</css>',
-  >       'http://baidu.com', 'red', 'green', 'highlight,underline', '自定义标签：携带超链接、红字、绿底、高亮、下划线'
+  >      '<css fg="%s" bg="%s" options="%s">自定义标签，附带属性：%s</css>',
+  >      Style::RED, Style::GREEN, join(',', [Style::HIGHLIGHT, Style::UNDERLINE]),
+  >      '红字，绿底，高亮、下划线'
   >   ));
+  >   
   >   $output->write(PHP_EOL);
   >   
   >   $output->writeln('在 write 的基础上换行');
-  >   $output->writeln('输出消息并换 2 行', 2);
+  >   $output->writeln(sprintf('输出消息并换 %d 行', rand()));

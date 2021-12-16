@@ -262,12 +262,12 @@ composer require loner/console
   >
   >   ```php
   >   # 返回是否有选项
-  >   $concrete->hasOption('选项名');
+  >   $inputConcrete->hasOption('选项名');
   >
   >   # 获取选项值
   >    # 复合型，返回字符串值列表；否则返回字符串
   >    # 若指定选项名，为提供值，返回 null
-  >   $concrete->getOption('选项名');    
+  >   $inputConcrete->getOption('选项名');    
   >   ```
 
   > * 消息输出

@@ -276,6 +276,10 @@ composer require loner/console
   >   $output->write('这是普通消息');
   >   $output->write(PHP_EOL);
   >   
+  >   # 第二个参数表示是否换行，第三个参数表示输出模式，优先于控制台选项output
+  >   $output->write('这里的<info>信息标签</info>不会被解析', false, Output::OUTPUT_RAW);
+  >   $output->write(PHP_EOL);
+  >   
   >   $output->write('这是信息标签样式：<info>信息</info>');
   >   $output->write(PHP_EOL);
   >   
@@ -297,4 +301,5 @@ composer require loner/console
   >   $output->write(PHP_EOL);
   >   
   >   $output->writeln('在 write 的基础上换行');
-  >   $output->writeln(sprintf('输出消息并换 %d 行', rand()));
+  >   # 第二个参数表示输出模式，优先于控制台选项output
+  >   $output->writeln('这里的<info>标签</info>将被无视', Output::plain);

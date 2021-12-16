@@ -38,8 +38,7 @@ class Descriptor
 
         $this->output->writeln();
         $this->output->writeln('<comment>Usages:</comment>');
-        $this->output->writeln('  command [arguments] [options]');
-        $this->output->writeln('  command [options] [--] [arguments]');
+        $this->output->writeln(['  command [arguments] [options]', '  command [options] [--] [arguments]']);
 
         $this->describeOptions($console->getDefinition()->getOptions());
 

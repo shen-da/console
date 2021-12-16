@@ -62,38 +62,41 @@ class Output
     /**
      * 输出消息
      *
-     * @param string $message
+     * @param string|iterable $messages
+     * @param bool $newlines
+     * @param int|null $mode
      */
-    public function write(string $message = ''): void
+    public function write(string|iterable $messages, bool $newlines = false, int $mode = null): void
     {
         if ($this->isQuiet()) {
             return;
         }
 
-        switch ($this->mode) {
-            case self::OUTPUT_DECORATE:
-                $message = $this->formatter->format($message);
-                break;
-            case self::OUTPUT_RAW:
-                break;
-            case self::OUTPUT_PLAIN:
-                $message = strip_tags($message);
-                break;
+        if ($mode === null) {
+            $mode = $this->mode;
         }
 
-        @fwrite($this->stream, $message);
+        if (is_iterable($messages)) {
+            foreach ($messages as $message) {
+                $this->doWrite($message, $mode, $newlines);
+            }
+        } else {
+            $this->doWrite($messages, $mode, $newlines);
+        }
+
+
         fflush($this->stream);
     }
 
     /**
      * 输出消息并换行
      *
-     * @param string $message
-     * @param int $lines
+     * @param string|iterable $messages
+     * @param int|null $mode
      */
-    public function writeln(string $message = '', int $lines = 1): void
+    public function writeln(string|iterable $messages = '', int $mode = null): void
     {
-        $this->write($message . str_repeat(PHP_EOL, $lines));
+        $this->write($messages, true, $mode);
     }
 
     /**
@@ -190,5 +193,32 @@ class Output
     {
         $filename = str_contains(PHP_OS, 'OS400') ? 'php://stdout' : 'php://output';
         return fopen($filename, 'w');
+    }
+
+    /**
+     * 输出消息
+     *
+     * @param string $message
+     * @param int $mode
+     * @param bool $newlines
+     */
+    private function doWrite(string $message, int $mode, bool $newlines): void
+    {
+        switch ($mode) {
+            case self::OUTPUT_DECORATE:
+                $message = $this->formatter->format($message);
+                break;
+            case self::OUTPUT_RAW:
+                break;
+            case self::OUTPUT_PLAIN:
+                $message = strip_tags($message);
+                break;
+        }
+
+        if ($newlines) {
+            $message .= PHP_EOL;
+        }
+
+        @fwrite($this->stream, $message);
     }
 }

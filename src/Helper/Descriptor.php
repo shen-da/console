@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Loner\Console\Descriptor;
+namespace Loner\Console\Helper;
 
 use Loner\Console\Command\CommandInterface;
 use Loner\Console\Console;
@@ -13,7 +13,7 @@ use Loner\Console\Output\Output;
 /**
  * 描述器
  *
- * @package Loner\Console\Descriptor
+ * @package Loner\Console\Helper
  */
 class Descriptor
 {
@@ -43,6 +43,29 @@ class Descriptor
         $this->describeOptions($console->getDefinition()->getOptions());
 
         $this->describeCommands($console);
+    }
+
+    /**
+     * 描述命令
+     *
+     * @param CommandInterface $command
+     */
+    public function describeCommand(CommandInterface $command): void
+    {
+        if ('' !== $description = $command->getDescription()) {
+            $this->output->writeln();
+            $this->output->writeln('<comment>Description:</comment>');
+            $this->output->writeln('  ' . $description);
+        }
+
+        $this->output->writeln();
+        $this->output->writeln('<comment>Usages:</comment>');
+        $this->output->writeln('  ' . $command->getSynopsis(true));
+        foreach ($command->getUsages() as $usage) {
+            $this->output->writeln('  ' . $usage);
+        }
+
+        $this->describeDefinition($command->getDefinition());
     }
 
     /**
@@ -195,32 +218,6 @@ class Descriptor
                     $this->output->writeln(sprintf('  <info>%s</info>  %s%s', $name, $space, $command->getDescription()));
                 }
             }
-        }
-    }
-
-    /**
-     * 描述命令
-     *
-     * @param CommandInterface $command
-     */
-    public function describeCommand(CommandInterface $command): void
-    {
-        if ('' !== $description = $command->getDescription()) {
-            $this->output->writeln();
-            $this->output->writeln('<comment>Description:</comment>');
-            $this->output->writeln('  ' . $description);
-        }
-
-        $this->output->writeln();
-        $this->output->writeln('<comment>Usages:</comment>');
-        $this->output->writeln('  ' . $command->getSynopsis(true));
-        foreach ($command->getUsages() as $usage) {
-            $this->output->writeln('  ' . $usage);
-        }
-
-        $definition = $command->getDefinition();
-        if ($definition->getOptions() || $definition->getArguments()) {
-            $this->describeDefinition($definition);
         }
     }
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Loner\Console\Output;
 
 use Loner\Console\Exception\InvalidArgumentException;
+use Throwable;
 
 /**
  * 输出
@@ -34,6 +35,13 @@ class Output
     public const OUTPUT_QUIET = 8;
 
     /**
+     * 是否运行在 IBM iSeries（OS400）
+     *
+     * @var false
+     */
+    private static bool $isRunningOS400;
+
+    /**
      * 消息输出模式
      *
      * @var int
@@ -55,7 +63,7 @@ class Output
      */
     public function __construct(private Formatter $formatter, int $mode = self::OUTPUT_DECORATE)
     {
-        $this->stream = self::getOutputStream();
+        $this->stream = self::openOutputStream();
         $this->setMode($mode);
     }
 
@@ -97,6 +105,19 @@ class Output
     public function writeln(string|iterable $messages = '', int $mode = null): void
     {
         $this->write($messages, true, $mode);
+    }
+
+    /**
+     * 输出异常信息
+     *
+     * @param Throwable $throwable
+     * @param bool $newlines
+     * @param int|null $mode
+     */
+    public function throwable(Throwable $throwable, bool $newlines = true, int $mode = null): void
+    {
+        $messages = sprintf('%s<error>%s</error>', PHP_EOL, $throwable->getMessage());
+        $this->getErrorOutput()->write($messages, $newlines, $mode);
     }
 
     /**
@@ -185,14 +206,69 @@ class Output
     }
 
     /**
+     * 获取错误输出
+     *
+     * @return $this
+     */
+    public function getErrorOutput(): self
+    {
+        return $this->errorOutput ??= self::createErrorOutput($this);
+    }
+
+    /**
+     * 创建错误输出
+     *
+     * @param Output $output
+     * @return static
+     */
+    private static function createErrorOutput(self $output): self
+    {
+        $new = clone $output;
+        $new->stream = self::openErrorStream();
+        return $new;
+    }
+
+    /**
      * 获取输出流
      *
      * @return resource
      */
-    private static function getOutputStream()
+    private static function openOutputStream()
     {
-        $filename = str_contains(PHP_OS, 'OS400') ? 'php://stdout' : 'php://output';
+        $filename = self::isRunningOS400() ? 'php://output' : 'php://stdout';
         return fopen($filename, 'w');
+    }
+
+    /**
+     * 获取错误流
+     *
+     * @return resource
+     */
+    private static function openErrorStream()
+    {
+        $filename = self::isRunningOS400() ? 'php://output' : 'php://stderr';
+        return fopen($filename, 'w');
+    }
+
+    /**
+     * 检查运行是否为 IBM iSeries（OS400）
+     *  该环境不能正确地将 ASCII 字符编码转换为 EBCDIC
+     *
+     * @return bool
+     */
+    private static function isRunningOS400(): bool
+    {
+        if (!isset(self::$isRunningOS400)) {
+            self::$isRunningOS400 = false;
+            foreach ([php_uname('s'), getenv('OSTYPE'), PHP_OS] as $check) {
+                if ($check && stripos($check, 'OS400') !== false) {
+                    self::$isRunningOS400 = true;
+                    break;
+                }
+            }
+        }
+
+        return self::$isRunningOS400;
     }
 
     /**

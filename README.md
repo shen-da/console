@@ -303,3 +303,75 @@ composer require loner/console
   >   $output->writeln('在 write 的基础上换行');
   >   # 第二个参数表示输出模式，优先于控制台选项output
   >   $output->writeln('这里的<info>标签</info>将被无视', Output::plain);
+
+  向用户提问
+
+  > * 创建提问对象
+  >
+  >   ```php
+  >   # Loner\Console\Helper\Questioner
+  >   $questioner = new Questioner($output);
+  >   ```
+
+  > * 常规问题
+  >
+  >   ```php
+  >   # 创建普通问题
+  >   # Loner\Console\Question\Question
+  >   # 参数：问题、默认回答（默认为 null）
+  >   $question = new Question('请输入你的银行卡密码？', '123456');
+  >   
+  >   # 隐藏用户响应
+  >   $question->setHidden(true); // 默认 false，不隐藏
+  >   # 隐藏失败时，不可以回退为非隐藏问题
+  >   $question->setHiddenFallback(false);  // 默认 true，隐藏失败，可以作不隐藏处理
+  >   
+  >   # 对用户响应个体不去除两边空白字符
+  >   $question->setTrim(false); // 默认 true, 去除两边空白字符
+  >   
+  >   # 设置用户响应格式器
+  >   $question->setNormalizer(fn($answer) => (string)$answer); // 默认 null，无格式器
+  >   
+  >   # 设置用户响应验证器（默认 null，无验证器）
+  >   $question->setValidator(function($answer) {
+  >       if (strlen($answer) !== 6) {
+  >           # Loner\Console\Exception\QuestionValidationException
+  >           throw new QuestionValidationException('密码必须是6位数');
+  >       }
+  >       return $answer;
+  >   });
+  >   # 验证尝试次数（默认 null，不限次数）
+  >   $question->setMaxAttempts(3);
+  >
+  >   # 获取询问结果
+  >   $answer = $questioner->ask($question, $input);
+  >   ```
+
+  > * 确认性问题
+  >
+  >   ```php
+  >   # 创建普通问题
+  >   # Loner\Console\Question\ConfirmationQuestion
+  >   # 参数：问题、默认回答（默认为 true）
+  >   $question = new ConfirmationQuestion('你吃过饭了吗？', false);
+  >   
+  >   # 说明：用户输入“y”或“yes”后回车，或者直接回车，都是 true；否则为 false
+  >
+  >   # 获取询问结果
+  >   $answer = $questioner->ask($question, $input);
+  >   ```
+
+  > * 选择性问题
+  >
+  >   ```php
+  >   # 创建普通问题
+  >   # Loner\Console\Question\ChoiceQuestion
+  >   # 参数：问题、选项（关联或索引数组）、默认回答（字符串/整数，即选项下标或下标拼接字符串，默认为 null）
+  >   $question = new ChoiceQuestion('你喜欢什么颜色？', ['黑色', '白色', 'green' => '绿色'], '0,x');
+  >   
+  >   # 设置多选
+  >   $question->setMultiselect(true);  // 默认 false，单选
+  >   
+  >   # 获取询问结果（单选返回选项下标，多选返回下标列表）
+  >   $answer = $questioner->ask($question, $input);
+  >   ```

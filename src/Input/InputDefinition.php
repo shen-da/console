@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Loner\Console\Input;
 
-use Loner\Console\Exception\{InvalidArgumentException, LogicException, RuntimeException};
+use Loner\Console\Exception\{DefinitionResolvedException, InvalidArgumentException, LogicException};
 use Loner\Console\Input\Definition\{Argument, Option};
 
 /**
@@ -253,6 +253,7 @@ class InputDefinition
      * @param Input $input
      * @param bool $strict
      * @return InputConcrete
+     * @throws DefinitionResolvedException
      */
     public function resolve(Input $input, bool $strict = true): InputConcrete
     {
@@ -261,7 +262,7 @@ class InputDefinition
 
         // 提供常规参数不足，抛出异常
         if ($givenArgumentCount < $this->requiredArgumentCount) {
-            throw new RuntimeException(sprintf(
+            throw new DefinitionResolvedException(sprintf(
                 'At least %d arguments are required and only %d are provided.',
                 $this->requiredArgumentCount, $givenArgumentCount
             ));
@@ -272,7 +273,7 @@ class InputDefinition
 
         // 严格模式下，提供多余常规参数，抛出异常
         if ($strict && $givenArgumentCount > $allArgumentCount && $this->hasComplexArgument === false) {
-            throw new RuntimeException(
+            throw new DefinitionResolvedException(
                 sprintf(
                     'Only %d arguments are required, but %s are provided.',
                     $allArgumentCount, $givenArgumentCount
@@ -327,18 +328,18 @@ class InputDefinition
             if (empty($values)) {
                 // 若提供选项不带值，且该选项须提供值，抛出异常
                 if ($option->isRequired()) {
-                    throw new RuntimeException(sprintf('Option "%s" must provide a value.', $name));
+                    throw new DefinitionResolvedException(sprintf('Option "%s" must provide a value.', $name));
                 }
                 $options[$name] = $option->getDefault();
             } else {
                 // 若提供选项及值，且该选项不接受值，抛出异常
                 if (!$option->acceptValue()) {
-                    throw new RuntimeException(sprintf('Option "%s" does not accept values.', $name));
+                    throw new DefinitionResolvedException(sprintf('Option "%s" does not accept values.', $name));
                 }
 
                 // 若提供选项及多值，且该选项非复合型，抛出异常
                 if (!$option->isComplex() && count($values) > 1) {
-                    throw new RuntimeException(sprintf('Option "%s" cannot accept multiple values.', $name));
+                    throw new DefinitionResolvedException(sprintf('Option "%s" cannot accept multiple values.', $name));
                 }
 
                 $options[$name] = $option->isComplex() ? $values : $values[0];
@@ -348,10 +349,10 @@ class InputDefinition
         // 严格模式下，若提供多余选项，抛出异常
         if ($strict) {
             foreach ($longOptions as $name => $options) {
-                throw new RuntimeException(sprintf('Invalid option: "--%s".', $name));
+                throw new DefinitionResolvedException(sprintf('Invalid option: "--%s".', $name));
             }
             foreach ($shortOptions as $shortcut => $options) {
-                throw new RuntimeException(sprintf('Invalid option: "-%s".', $shortcut));
+                throw new DefinitionResolvedException(sprintf('Invalid option: "-%s".', $shortcut));
             }
         }
 

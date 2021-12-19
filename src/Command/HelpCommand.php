@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Loner\Console\Command;
 
-use Loner\Console\Descriptor\Descriptor;
+use Loner\Console\Helper\Descriptor;
 use Loner\Console\Input\Definition\Argument;
 use Loner\Console\Input\Input;
 use Loner\Console\Output\Output;

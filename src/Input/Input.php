@@ -15,6 +15,13 @@ use Loner\Console\Input\Definition\Option;
 class Input
 {
     /**
+     * 输入流
+     *
+     * @var resource|null
+     */
+    private $stream;
+
+    /**
      * 指令解析数组
      *
      * @var string[]
@@ -60,6 +67,28 @@ class Input
     public function __construct(array $tokens = null)
     {
         $this->parseTokens($tokens ?? self::getDefaultTokens());
+    }
+
+    /**
+     * 获取输入流
+     *
+     * @return resource|null
+     */
+    public function getStream()
+    {
+        return $this->stream;
+    }
+
+    /**
+     * 设置输入流
+     *
+     * @param resource $stream
+     * @return $this
+     */
+    public function setStream($stream): self
+    {
+        $this->stream = $stream;
+        return $this;
     }
 
     /**

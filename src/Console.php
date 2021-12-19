@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Loner\Console;
 
 use Loner\Console\Command\{CommandInterface, HelpCommand, ListCommand};
-use Loner\Console\Descriptor\Descriptor;
-use Loner\Console\Exception\{CommandNotFoundException, RuntimeException};
+use Loner\Console\Helper\Descriptor;
+use Loner\Console\Exception\{CommandNotFoundException, DefinitionResolvedException, QuestionValidationException};
 use Loner\Console\Input\{Definition\Option, InputDefinition, Input};
 use Loner\Console\Output\Output;
 use Throwable;
@@ -119,10 +119,10 @@ class Console
         try {
             $concrete = $definition->resolve($input, !$hasCommand);
             $this->determineOutputMode($output, $concrete->getOption('output'));
-        } catch (RuntimeException $exception) {
+        } catch (DefinitionResolvedException $e) {
             $this->setOutMode($output);
             $this->describe($output);
-            return self::exception($exception, $output);
+            return self::throwable($e, $output);
         }
 
         // 没有命令，输出控制台描述
@@ -134,9 +134,9 @@ class Console
         $name = $input->getArgumentValue(0);
         try {
             $command = $this->get($name);
-        } catch (CommandNotFoundException $exception) {
+        } catch (CommandNotFoundException $e) {
             $this->describe($output);
-            return self::exception($exception, $output);
+            return self::throwable($e, $output);
         }
 
         try {
@@ -144,9 +144,16 @@ class Console
             $input = $input->clone(1, ...$definition->getOptions());
             $code = $command->run($input, $output);
             return self::normalizeCode($code);
-        } catch (Throwable $exception) {
-            (new Descriptor($output))->describeCommand($this->get('help'));
-            return self::exception($exception, $output);
+        } catch (Throwable $throwable) {
+            // 不再输出问答验证异常的信息（验证时已有输出）
+            if ($throwable instanceof QuestionValidationException) {
+                $output = null;
+            } // 定义解析异常，输出命令详情
+            elseif ($throwable instanceof DefinitionResolvedException) {
+                (new Descriptor($output))->describeCommand($this->get('help'));
+            }
+
+            return self::throwable($throwable, $output);
         }
     }
 
@@ -222,16 +229,16 @@ class Console
     }
 
     /**
-     * 异常输出
+     * 运行时对抛出的错误或异常进行处理，返回错误码的标准化结果
      *
-     * @param Throwable $exception
-     * @param Output $output
+     * @param Throwable $throwable
+     * @param Output|null $output
      * @return int
      */
-    private static function exception(Throwable $exception, Output $output): int
+    private static function throwable(Throwable $throwable, ?Output $output = null): int
     {
-        $output->writeln(sprintf("\n<error> %s  </error>", $exception->getMessage()));
-        return self::normalizeCode($exception->getCode(), true);
+        $output?->throwable($throwable);
+        return self::normalizeCode($throwable->getCode(), true);
     }
 
     /**

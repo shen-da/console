@@ -21,7 +21,7 @@ class Console
     /**
      * 版本号
      */
-    public const VERSION = '1.0.1';
+    public const VERSION = '1.0.2';
 
     /**
      * 命令库

@@ -297,7 +297,6 @@ composer require loner/console
   >      Style::RED, Style::GREEN, join(',', [Style::HIGHLIGHT, Style::UNDERLINE]),
   >      '红字，绿底，高亮、下划线'
   >   ));
-  >   
   >   $output->write(PHP_EOL);
   >   
   >   $output->writeln('在 write 的基础上换行');
@@ -367,7 +366,7 @@ composer require loner/console
   >   # 创建普通问题
   >   # Loner\Console\Question\ChoiceQuestion
   >   # 参数：问题、选项（关联或索引数组）、默认回答（字符串/整数，即选项下标或下标拼接字符串，默认为 null）
-  >   $question = new ChoiceQuestion('你喜欢什么颜色？', ['黑色', '白色', 'green' => '绿色'], '0,x');
+  >   $question = new ChoiceQuestion('你喜欢什么颜色？', ['黑色', '白色', 'green' => '绿色'], '0,green');
   >   
   >   # 设置多选
   >   $question->setMultiselect(true);  // 默认 false，单选

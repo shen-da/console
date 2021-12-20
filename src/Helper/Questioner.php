@@ -18,6 +18,11 @@ use Throwable;
  */
 class Questioner
 {
+    /**
+     * 输入流是否可与终端交互
+     *
+     * @var bool
+     */
     private static bool $stdinIsInteractive;
 
     /**

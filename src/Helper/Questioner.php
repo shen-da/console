@@ -39,9 +39,9 @@ class Questioner
      * @throws MissingInputException
      * @throws QuestionValidationException
      */
-    public function ask(Question $question, ?Input $input = null): mixed
+    public function ask(Question $question, Input $input = null): mixed
     {
-        $inputStream = $input->getStream() ?? STDIN;
+        $inputStream = $input?->getStream() ?? STDIN;
 
         $validator = $question->getValidator();
 

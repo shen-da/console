@@ -8,6 +8,8 @@ namespace Loner\Console\Question;
  * 确定性问题
  *
  * @package Loner\Console\Question
+ *
+ * @method bool getDefault()
  */
 class ConfirmationQuestion extends Question
 {

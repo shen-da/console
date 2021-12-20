@@ -11,15 +11,17 @@ use Loner\Console\Exception\QuestionValidationException;
  * 选择性问题
  *
  * @package Loner\Console\Question
+ *
+ * @method string|int getDefault()
  */
 class ChoiceQuestion extends Question
 {
     /**
-     * 是否多选
+     * 选项
      *
-     * @var bool
+     * @var array
      */
-    private bool $multiselect = false;
+    private array $choices;
 
     /**
      * 提示
@@ -29,19 +31,32 @@ class ChoiceQuestion extends Question
     private string $prompt = '> ';
 
     /**
+     * 是否多选
+     *
+     * @var bool
+     */
+    private bool $multiselect = false;
+
+    /**
      * 初始化问题、选项、默认回答
      *
      * @param string $question
      * @param array $choices
-     * @param mixed|null $default
+     * @param string|int|null $default
      */
-    public function __construct(private string $question, private array $choices, private mixed $default = null)
+    public function __construct(string $question, array $choices, string|int $default = null)
     {
         if (!$choices) {
             throw new LogicException('Choice question must have at least 1 choice available.');
         }
 
+        if ($default === null) {
+            $default = key($choices);
+        }
+
         parent::__construct($question, $default);
+
+        $this->choices = $choices;
 
         $this->setValidator($this->defaultValidator());
     }
@@ -54,6 +69,28 @@ class ChoiceQuestion extends Question
     public function getChoices(): array
     {
         return $this->choices;
+    }
+
+    /**
+     * 获取选择提示
+     *
+     * @return string
+     */
+    public function getPrompt(): string
+    {
+        return $this->prompt;
+    }
+
+    /**
+     * 设置选项提示
+     *
+     * @param string $prompt
+     * @return $this
+     */
+    public function setPrompt(string $prompt): self
+    {
+        $this->prompt = $prompt;
+        return $this;
     }
 
     /**
@@ -76,28 +113,6 @@ class ChoiceQuestion extends Question
     {
         $this->multiselect = $multiselect;
         $this->setValidator($this->defaultValidator());
-        return $this;
-    }
-
-    /**
-     * 获取选择提示
-     *
-     * @return string
-     */
-    public function getPrompt(): string
-    {
-        return $this->prompt;
-    }
-
-    /**
-     * 设置选项提示
-     *
-     * @param string $prompt
-     * @return $this
-     */
-    public function setPrompt(string $prompt): self
-    {
-        $this->prompt = $prompt;
         return $this;
     }
 

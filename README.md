@@ -365,7 +365,7 @@ composer require loner/console
   >   ```php
   >   # 创建普通问题
   >   # Loner\Console\Question\ChoiceQuestion
-  >   # 参数：问题、选项（关联或索引数组）、默认回答（字符串/整数，即选项下标或下标拼接字符串，默认为 null）
+  >   # 参数：问题、选项（关联或索引数组）、默认回答（字符串/整数，即选项下标或下标拼接字符串；默认为 null，自动识别为首个下标）
   >   $question = new ChoiceQuestion('你喜欢什么颜色？', ['黑色', '白色', 'green' => '绿色'], '0,green');
   >   
   >   # 设置多选

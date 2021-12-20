@@ -151,6 +151,8 @@ class Console
             } // 定义解析异常，输出命令详情
             elseif ($throwable instanceof DefinitionResolvedException) {
                 (new Descriptor($output))->describeCommand($this->get('help'));
+            } elseif ($throwable instanceof CommandNotFoundException) {
+                $this->describe($output);
             }
 
             return self::throwable($throwable, $output);

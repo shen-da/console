@@ -313,7 +313,7 @@ class InputDefinition
 
             // 合并选项值列表
             if ($hasOptions) {
-                if ($shortcut) {
+                if ($hasShort) {
                     $values = array_merge($longOptions[$name], $shortOptions[$shortcut]);
                     unset($shortOptions[$shortcut]);
                 } else {

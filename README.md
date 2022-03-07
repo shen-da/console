@@ -315,7 +315,7 @@ composer require loner/console
   > * 常规问题
   >
   >   ```php
-  >   # 创建普通问题
+  >   # 创建问题
   >   # Loner\Console\Question\Question
   >   # 参数：问题、默认回答（默认为 null）
   >   $question = new Question('请输入你的银行卡密码？', '123456');
@@ -349,7 +349,7 @@ composer require loner/console
   > * 确认性问题
   >
   >   ```php
-  >   # 创建普通问题
+  >   # 创建问题
   >   # Loner\Console\Question\ConfirmationQuestion
   >   # 参数：问题、默认回答（默认为 true）
   >   $question = new ConfirmationQuestion('你吃过饭了吗？', false);
@@ -363,7 +363,7 @@ composer require loner/console
   > * 选择性问题
   >
   >   ```php
-  >   # 创建普通问题
+  >   # 创建问题
   >   # Loner\Console\Question\ChoiceQuestion
   >   # 参数：问题、选项（关联或索引数组）、默认回答（字符串/整数，即选项下标或下标拼接字符串；默认为 null，自动识别为首个下标）
   >   $question = new ChoiceQuestion('你喜欢什么颜色？', ['黑色', '白色', 'green' => '绿色'], '0,green');
